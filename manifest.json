@@ -1,0 +1,74 @@
+{
+  "manifest_version": 3,
+  "name": "Inklusiv",
+  "version": "1.0",
+  "description": "Copilot for web accessibility",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "webNavigation",
+    "webRequest",
+    "audio"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/fonts/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "explainPage-worker.js"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "scripts/colorblind.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    },
+    {
+      "js": [
+        "scripts/adhd.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    },
+    {
+      "js": [
+        "scripts/dyslexia.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon.png",
+      "48": "images/icon.png",
+      "128": "images/icon.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+  }
+}
