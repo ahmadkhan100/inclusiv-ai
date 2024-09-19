@@ -1,0 +1,8 @@
+body {
+    width: 200px;
+    padding: 10px;
+  }
+  input[type="checkbox"] {
+    margin-bottom: 5px;
+  }
+  
