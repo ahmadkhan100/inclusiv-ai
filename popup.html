@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" rel="stylesheet">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  
+
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #292D3E;
+    color: white;
+    text-align: center;
+    }
+
+/* Style the checkbox */
+input[type="checkbox"] {
+  height: 40px; /* Smaller height */
+  width: 40px; /* Smaller width */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 5px solid transparent; /* Smaller border */
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  box-shadow: 
+    -2px -2px 4px rgba(243, 11, 245, 0.63),
+    2px 2px 4px rgba(70, 70, 70, 0.12);
+  border-radius: 50%;
+  position: absolute;
+  top: 20px; /* Distance from the top */
+  right: 20px; /* Distance from the right */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Style the icon inside the checkbox */
+input[type="checkbox"]::after {
+  content: "\23FB"; /* Unicode power symbol */
+  color: #7a7a7a;
+  font-size: 30px; /* Adjust the font size as necessary */
+  transition: color 0.3s;
+}
+
+/* Change icon color when checked */
+input[type="checkbox"]:checked::after{
+  color: rgb(227, 21, 45);
+}
+  .logo {
+    margin-bottom: 24px;
+  }
+  .logo img {
+    width: 100px; /* Adjust as necessary */
+  }
+  .title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  .description {
+    font-size: 16px;
+    margin-bottom: 32px;
+    font-weight: bold;
+    color: #FFFFFF; /* Explicitly set the color to white */
+    opacity: 1;
+    background: none; 
+    justify-content: space-between;
+  }
+  .text-gradient { /* Updated class name to match HTML */
+    font-size: 60px; /* Adjust the size as needed to ensure the gradient is visible */
+    font-weight: bold; /* Optional: to enhance the visibility of the gradient */
+    background-image: linear-gradient(to right bottom, #12c2e9, #00baf7, #20afff, #5ba1ff, #8a90ff, #ae81f4, #cc70e2, #e55dcb, #f450af, #fb4991, #fc4975, #f64f59);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text; /* For browsers that support the unprefixed property */
+  }
+
+  .mic {
+    position: relative; 
+    display: inline-block; 
+    vertical-align: middle;
+    margin-bottom: 70px; /* Adjusted margin */
+}
+.mic::before, .mic::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 100%;
+  z-index: 2;
+}
+
+.mic::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    background-color: #C51162; /* Pink background color */
+    border-radius: 50%;
+    z-index: 1; /* Below the mic icon */
+    box-shadow: 0 0 30px 30px #1c084f; /* Outer glow effect */
+    background-image: linear-gradient(to right bottom, #12c2e9, #20afff, #8a90ff, #ae81f4);
+    display: block; /* Ensure it's always displayed */
+  }
+
+.mic-icon {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(5);
+  display: block;
+  width: 22.5px;
+  height: 22.5px; /* Adjusted height */
+  margin: auto;
+  z-index: 2;
+  visibility: visible; /* Added visibility property */
+}
+
+.mic-shadow {
+  display: none;
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 100%;
+  z-index: 0;
+  box-shadow: 9px -49.5px 27px 13.5px #823ca6, 21.6px -9px 42.3px 9px #aab3d2, -18.9px -22.5px 87.3px 9px #5acee3, 45.9px 4.5px 15.3px 9px #1b7d8f, 2.7px 1.8px 69.3px 9px #f30bf5;  
+  animation: shadow-rotate 1.5s linear infinite;  
+  transform-origin: center;
+  display: none;
+}
+/* The default state without rotating circles */
+.mic.no-animation::after,
+.mic.no-animation .mic-shadow {
+  animation: none;
+}
+
+
+
+
+/* Only play animations when the recording class is present */
+.mic.recording .mic-shadow {
+  display: block;
+  animation: shadow-rotate 1.5s linear infinite;
+}
+.mic.recording::after {
+  animation: circle-size 0.8s linear infinite alternate;
+}
+
+.loader {
+    display: none; /* Initially hidden */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    z-index: 2; /* Make sure it's above the mic-icon */
+    will-change: transform; /* Optimizes the animation */
+  }
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg) translateZ(0); /* 3D transform hack to trigger GPU acceleration */
+  }
+  100% {
+    transform: rotate(360deg) translateZ(0); /* 3D transform hack to trigger GPU acceleration */
+  }
+}
+
+.loader span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(#12c2e9, #00baf7, #20afff, #5ba1ff, #8a90ff, #ae81f4, #cc70e2, #e55dcb, #f450af, #fb4991, #fc4975, #f64f59);
+  will-change: background, filter; /* Optimizes the animation */
+  backface-visibility: hidden; /* 3D transform hack to trigger GPU acceleration */
+}
+
+.loader span:nth-child(1) {
+  filter: blur(7.5px);
+  animation: rotate 2s linear infinite;
+}
+.loader span:nth-child(2) {
+  filter: blur(11.25px);
+  animation: rotate 2s linear infinite;
+}
+.loader span:nth-child(3) {
+  filter: blur(30px);
+  animation: rotate 2s linear infinite;
+}
+.loader span:nth-child(4) {
+  filter: blur(52.5px);
+  animation: rotate 2s linear infinite;
+}
+
+.loader::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  background: #292D3E; /* Set to the background color of the body for a 'cut-out' effect */
+  border-radius: 50%;
+  z-index: 2;
+}
+
+@keyframes circle-size {
+  from {
+    width: 120px;
+    height: 120px;
+  }
+  to {
+    width: 120px;
+    height: 120px;
+  }
+}
+@keyframes shadow-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+
+  
+</style>
+</head>
+<body style="
+  width: 95vw;
+  height: 95vh;
+  background: #0a0b1a;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  padding: 10px;
+">
+  <!-- Gradient background div -->
+  <div style="
+    width: 170px;
+    height: 170px;
+    background: radial-gradient(circle, #4c569d, #c33764);
+    filter: blur(70px);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+  "></div>
+
+  <body>
+    <input type="checkbox" />
+  </body>
+  <h1 class="text-gradient">inclusiv.
+    <div class="description">ai copilot for accessibility</div>
+  </h1>
+  <button id="recordButton" class="mic no-animation">
+    <!-- Loader goes here -->
+    <div class="loader">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <!-- End loader -->
+    <div class="mic-shadow"></div>
+    <img src="images/mic-23.png" class="mic-icon" alt="Mic Icon">
+  </button>
+  </div>
+  <audio id="audio" style="display: none;"></audio>
+  <script src="popup.js"></script>
+
+  <div class="loader">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</body>
+</html>
