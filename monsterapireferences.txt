@@ -1,0 +1,2712 @@
+# Introduction
+Introduction
+If building an AI powered application is like navigating a jungle, then MonsterAPI is your Swiss Army Knife!
+
+Monster API platform brings access to powerful Generative AI models to developers, allowing them to build applications that leverage the latest advances in machine learning for use-cases like text to image generation, speech to text transcription, chat completion, code generation and much more!
+
+Our APIs scale on-demand with your needs and the REST API design allows you to quickly integrate powerful Gen AI capabilities in your applications.
+
+Below mentioned are some of the developer oriented features our APIs offer:
+
+Requests can be processed with either form-data or JSON-encoded bodies.
+Responses are returned in a JSON-encoded format.
+Utilizes industry standard HTTP methods, response codes, and authentication procedures.
+Get Started:
+1. Create a Monster API account
+Sign Up on Monster API platform easily via Google or GitHub or your email to create an account.
+
+After successful sign up, you'll receive FREE API Credits to explore the platform and test our APIs for your use-case.
+
+2. Obtain API Key
+Once you've created an account, we automatically generate an API key for you which is visible directly in the dashboard as shown below:
+
+
+We assign a unique key to each account. You can generate a new key anytime.
+
+Each key is tied to a single user account. With every successful API call, appropriate credits will be deducted.
+
+🚧Please do not share your API Key with anyone
+
+Hurraayyy 🥳 Now you are all set, let's dive in...🏄
+
+
+# Generative Model API Concepts
+
+Generative Models API Concepts
+Provides information about using Generative AI models on Monster API
+
+Monster API provides several pre-hosted Generative AI models.
+
+The API requests operate asynchronously. This means that after a successful API request, you'll receive a process_id.
+
+This process_id can then be utilized to retrieve results via the Fetch Results API.
+
+Let's explore some of the API concepts below:
+
+Authentication:
+Monster API uses Bearer Token authentication.
+
+Just include your API key in the Authorization Header for each API request.
+
+API Request Body:
+Monster API supports multiple Content Types in API request body, thus ensuring seamless integration with your workflows.
+
+Supported Content-Types:
+
+application/json
+multipart/form-data
+Requests made with any of the above Content-Type are treated same by our platform.
+
+Use cases:
+Send a JSON payload in API request:
+cURL
+
+curl --request POST \
+     --url https://api.monsterapi.ai/v1/generate/falcon-7b-instruct \
+     --header 'accept: application/json' \
+     --header 'authorization: Bearer <API Key>' \
+     --header 'content-type: application/json' \
+     --data '
+{
+  "prompt": "What is two + two?"
+}
+'
+Send a file in API request:
+cURL
+
+curl --request POST \
+     --url https://api.monsterapi.ai/v1/generate/whisper \
+     --header 'accept: application/json' \
+     --header 'authorization: Bearer <API Key>' \
+     --header 'content-type: multipart/form-data' \
+     --form file=@audiofile.mp3 \
+     --form language=en
+❗️
+File size is limited to 8 MB
+
+If you want to use a larger file in your requests, then refer to the implementation below.
+
+Send large files (> 8 MB) in API request:
+By default, our APIs handle files up to 8 MB. For larger files, you can either send a publicly accessible file URL or use our Upload API. This API uploads your files to our S3 buckets and returns a download url. You can then use this URL in an API request to Generative AI APIs with an application/json payload.
+
+The download URLs returned by Upload API are secure and valid for 30 minutes only.
+
+Do checkout our Recipe on working with large files or refer File Upload API
+
+File Upload > 8MB
+Open Recipe
+To use the uploaded files in your Gen AI API requests, refer to the specific AI Model API guides.
+
+API Responses:
+Our APIs returns a standard JSON format response. Each API call returns a process_id
+
+JSON
+
+{
+  "callback_url": "",
+  "message": "Request Accepted Successfully",
+  "process_id": "aaaaaa-bbbbbb-cc-ggh",
+  "status_url": "https://api.monsterapi.ai/v1/status/aaaaaa-bbbbbb-cc-ggh"
+}
+You need to use Fetch Results API to retrieve status of your request or fetch final results.
+
+This response also provides a status_url which can be used to fetch results. Simply use GET method to query this status_url with your API key set in Authorization header.
+
+Want to know more about schema for all the Generative AI Model APIs? Do checkout our Docs
+
+Webhooks:
+Monster API provides an option to easily use a webhook URL as well.
+
+Monster API provides an option to easily use a registered webhook as a callback.
+
+Webhooks offer a powerful solution for developers:
+
+Instead of manually polling the Fetch Results API, they can effortlessly receive automatic status updates on their API requests. This approach not only simplifies automation but also enhances scalability.
+
+Pre-requisites for using a webhook:
+
+Register a webhook URL on Monster API platform with a webhook name of your choice.
+Pass the webhook in your Generative AI Model API requests using your webhook's name.
+That's it. Now your webhook will start receiving your API request status updates.
+
+Check out our Webhooks API to get started.
+
+Also, you may explore this tutorial for a quick start:
+
+Add webhook to API calls
+Open Recipe
+
+Error Codes:
+Monster API follows standard HTTP Error codes and verbs.
+
+JSON
+
+{
+  "message": "Error Message"
+}
+HTTP Status Code Summary
+HTTP Error Code	Definition
+200 - OK	Everything worked as expected
+400 - Bad Request	The request was unacceptable, often due to a missing a required parameter
+401 - Unauthorised	No valid API key provided.
+403 - Forbidden	The API key doesn't have permissions to perform the request.
+404 - Not Found	The requested resource doesn't exist
+408 - Request Timeout	Provided webhook is not responding and getting timeout out
+415 - Unsupported Content	Unsupported file extension for a model
+429 - Too Many Request	Too many requests hit the API too quickly. Please slow down or upgrade your plan.
+500,501,502 - Internal Server Error	Something went wrong on our side
+With all this information, let's get started with our first Generative Model API request!
+
+# Get Webhooks
+
+Get Webhooks
+GET
+https://api.monsterapi.ai/v1/webhook
+Get Registered Webhooks
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+url_name
+string
+Name of registered webhook
+
+RESPONSES
+
+200
+Successful Operation
+
+
+401
+Unauthorised
+
+
+404
+Not found
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/webhook"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# Add Webhooks
+Add Webhook
+POST
+https://api.monsterapi.ai/v1/webhook
+Register a new webhook.
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+BODY PARAMS
+webhook_url
+url
+required
+URL of webhook. Our system try to reach this webhook before registing. Make sure URL is available before registering with Monster API
+
+url_name
+string
+required
+unique identiier for this webhook_url
+
+RESPONSES
+
+200
+Successful Operation
+
+401
+Unauthorised
+
+404
+Not found
+
+408
+Request Timeout
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/webhook"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+# Delete Webhook
+Delete Webhook
+DELETE
+https://api.monsterapi.ai/v1/webhook
+Delete a webhook.
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+url_name
+string
+required
+Name of registered webhook
+
+RESPONSES
+
+200
+Successful Operation
+
+
+401
+Unauthorised
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/webhook"
+
+headers = {"accept": "application/json"}
+
+response = requests.delete(url, headers=headers)
+
+print(response.text)
+
+# Get File Upload URL
+Get File Upload URL
+GET
+https://api.monsterapi.ai/v1/upload
+You can upload large files to monsterAPI and get a sharable link (valid for 30 min).
+
+This API provides an upload URL and download URL for the filename provided as input.
+
+Upload URL: You need to send a PUT request to upload a file. Do checkout this Recepi
+
+Download URL: Use this link as file url for Image Generation Models or Speech Models
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+filename
+string
+required
+Name of the file to be uploaded. Make sure filename ends with proper extension
+
+RESPONSES
+
+200
+Successful Operation
+
+
+401
+Unauthorised
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/upload"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# MonsterAPI Python Client
+
+MonsterAPI Python Client
+A Python client for interacting with Monster API v2 AI Models and Services.
+
+Installation
+Bash
+
+pip install monsterapi
+Has support to following MonsterAPI services:
+Text-Gen/LLMs: ---------------
+falcon-7b-instruct
+falcon-40b-instruct
+mpt-7b-instruct
+mpt-30b-instruct
+llama2-7b-chat
+zephyr-7b-beta
+codellama-13b-instruct
+codellama-34b-instruct
+Image Gen: ----------
+txt2img - stable-diffusion v1.5
+sdxl - stable-diffusion XL V1.0
+pix2pix - Instruct-pix2pix
+img2img - Image to Image using Stable Diffusion
+photo-maker - PhotoMaker
+Speech Gen: -----------
+sunoai-bark - Bark (Sunoai Bark)
+whisper - (Whisper Large V2)
+speech2text-v2 - (Whisper Large V3)
+MonsterDeploy - Deploy Large Language Models
+Monster Deploy LLMs (deploy-llm)
+Basic Usage to access Hosted AI-Models
+Import Module
+Python
+
+from monsterapi import client
+set MONSTER_API_KEY env variable to your API key.
+Python
+
+os.environ["MONSTER_API_KEY"] = <your_api_key>
+client = client() # Initialize client
+or
+
+pass api_key parameter to client constructor.
+Python
+
+client = client(<api_key>) # pass api_key as parameter
+Use generate method
+Python
+
+result = client.generate(model='falcon-7b-instruct', data={
+    "prompt": "Your prompt here",
+    # ... other parameters
+})
+or
+
+Send a response to a model and suitable payload and retreive payload
+Python
+
+# Fetching a response
+response = client.get_response(model='falcon-7b-instruct', data={
+    "prompt": "Your prompt here",
+    # ... other parameters
+})
+print(response["process_id"])
+Get the status of the process
+Python
+
+status = client.get_status("your_process_id")
+print(status)
+Wait and Get the Result
+Python
+
+# Waiting for result
+result = client.wait_and_get_result("your_process_id")
+print(result)
+Quick Serve LLM
+Launch a llama2-7b model using QuickServe API
+Prepare and send payload to launch a LLM deployment.
+
+Choose Per_GPU_VRAM and GPU_Count based on your model size and batch size.
+
+Please see here for detailed list of supported model and infrastructure matrix.
+
+Python
+
+launch_payload = {
+    "basemodel_path": "meta-llama/Llama-2-7b-chat",
+    "loramodel_path": "",
+    "prompt_template": "{prompt}{completion}",
+    "api_auth_token": "b6a97d3b-35d0-4720-a44c-59ee33dbc25b",
+    "per_gpu_vram": 24,
+    "gpu_count": 1
+}
+
+# Launch a deployment
+ret = client.deploy("llm", launch_payload) 
+deployment_id = ret.get("deployment_id")
+print(ret)
+
+# Get deployment status
+status_ret = client.get_deployment_status(deployment_id)
+print(status_ret)
+
+logs_ret = client.get_deployment_logs(deployment_id)
+print(logs_ret)
+
+# Terminate Deployment
+terminate_return = client.terminate_deployment(deployment_id)
+print(terminate_return)
+
+# MonsterAPI NPM Package
+MonsterAPI NPM Package
+monsterapi is a JavaScript client library for adding Generative AI model capabilities in your application using Monster API. With this package you can send generative AI requests for Large language models hosted by MonsterAPI.
+
+Available Models
+Text Generation / Language Models (LLMs):
+falcon-7b-instruct
+mpt-7b-instruct
+llama2-7b-chat
+Image Generation:
+txt2img - stable-diffusion v1.5
+sdxl - stable-diffusion XL V1.0
+pix2pix - Instruct-pix2pix
+img2img - Image to Image using Stable Diffusion
+Speech Generation:
+sunoai-bark - Bark (Sunoai Bark)
+whisper - Whisper Large V2
+Usage
+Installation
+You can install the monsterapi package using npm or yarn:
+
+Bash
+
+npm install monsterapi
+or
+
+Bash
+
+yarn add monsterapi
+Import the Library
+To use the monsterapi library in your project, import the MonsterApiClient class:
+
+JavaScript
+
+import MonsterApiClient from "monsterapi";
+or
+
+JavaScript
+
+const { default: MonsterApiClient } = require("monsterapi");
+Initialize the Client
+Create an instance of the MonsterApiClient class by providing your API key:
+
+JavaScript
+
+const client = new MonsterApiClient("your-api-key");
+Replace 'your-api-key' with your actual Monster API key.
+
+Get Response
+You can use the get_response method to generate the Process Id of your request:
+
+JavaScript
+
+const model = "whisper"; // Replace with a valid model name
+const input = {
+  // Replace with valid input data for the model
+};
+
+client
+  .get_response(model, input)
+  .then((result) => {
+    // Handle the status response from the API
+    console.log("Generated Data:", result);
+  })
+  .catch((error) => {
+    // Handle API errors
+    console.error("Error:", error);
+  });
+Check Status
+You can use the get_status method to check the status of a Process Id:
+
+JavaScript
+
+const processId = "your-process-id"; // Replace with the actual process ID
+
+client
+  .get_status(processId)
+  .then((status) => {
+    // Handle the status response from the API
+    console.log("Status:", status);
+  })
+  .catch((error) => {
+    // Handle API errors
+    console.error("Error:", error);
+  });
+Wait and Get Result
+You can use the wait_and_get_result method it take process id and wait till status get completed and retrieve the result:
+
+JavaScript
+
+const processId = "your-process-id"; // Replace with the actual process ID
+
+client
+  .wait_and_get_result(processId)
+  .then((result) => {
+    // Handle the generated content result
+    console.log("Generated content result:", result);
+  })
+  .catch((error) => {
+    // Handle API errors or timeout
+    console.error("Error:", error);
+  });
+Generate Content
+You can use the generate method to retrive the result directly without using each function separately. generate method Generate the process Id and Retrive it Result :
+
+JavaScript
+
+const model = "whisper"; // Replace with a valid model name
+const input = {
+  // Replace with valid input data for the model
+};
+
+client
+  .generate(model, input)
+  .then((response) => {
+    // Handle the response from the API
+    console.log("Generated content:", response);
+  })
+  .catch((error) => {
+    // Handle API errors
+    console.error("Error:", error);
+  });
+Handle File Upload From Local Device
+You can use the uploadFile method to handle file uploads from your local computer and use them in various model requests.
+
+Using uploadFile in a Browser Environment (e.g. React, Next.js)
+In browser-based environments, such as React or Next.js, you can use the uploadFile method as follows:
+
+JavaScript
+
+const model = 'img2img'; // Replace with a valid model name
+const selectedFile = // Replace with your local file input
+
+const response = await client.uploadFile(selectedFile); // Use the 'await' keyword to handle the Promise
+
+const input = {
+  // Replace with valid input data for the model
+  init_image_url: response, // Use the response URL as the 'file' input
+};
+
+// Make a model request using the input
+const generatedResponse = await client.generate(model, input);
+
+// Handle the response from the API
+console.log('Generated content:', generatedResponse);
+
+Using uploadFile with Node.js
+In a Node.js environment, the uploadFile method returns an object containing both the upload_url and download_url. You should perform the upload request directly to the upload_url API. Here's an example of how to use the uploadFile method in Node.js. For More Details Visit https://developer.monsterapi.ai/reference/get_upload:
+
+JavaScript
+
+
+const model = 'img2img'; // Replace with a valid model name
+const selectedFile = // Replace with your local file input
+
+const uploadResponse = await client.uploadFile(selectedFile); // Use the 'await' keyword to handle the Promise
+
+// The response object contains the 'upload_url' and 'download_url' fields
+const { upload_url, download_url } = uploadResponse;
+
+// Now, you can use the 'upload_url' for direct file upload
+// Perform an HTTP PUT request to 'upload_url' with the file content
+
+// After successful upload, you can use the 'download_url' as an input in your model request
+const input = {
+  // Replace with valid input data for the model
+  init_image_url: download_url, // Use the 'download_url' as the 'file' input
+};
+
+// Make a model request using the input
+const generatedResponse = await client.generate(model, input);
+
+// Handle the response from the API
+console.log('Generated content:', generatedResponse);
+
+
+// Please note that all files uploaded via the uploadFile function are automatically removed from the database after 30 Min for privacy and security purposes.
+
+# Fetch Results
+Fetch Results
+GET
+https://api.monsterapi.ai/v1/status/{process_id}
+Fetch results for Generative Model API call
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+PATH PARAMS
+process_id
+string
+required
+The process_id is a unique identifier generated for each API call.
+It serves as a reference to track and retrieve information related to a specific process or transaction initiated through the API.
+
+RESPONSES
+
+200
+Successful Operation
+
+
+401
+Successful Operation
+
+
+404
+Successful Operation
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/status/process_id"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# codellama-13b-instruct
+codellama-13b-instruct
+POST
+https://api.monsterapi.ai/v1/generate/codellama-13b-instruct
+codellama-13b-instruct is a specialized 13B parameters generative text model built by Meta as part of the Llama 2 family of large language models (LLMs). It focuses on code generation and code-related dialogue. This variant has been fine-tuned specifically for instruction-based use cases. It aims to assist programmers in generating code, understanding code-related queries, and offering natural language explanations.
+
+We recommend using Code Llama – Instruct variants for any code generation tasks as it has been optimized for providing helpful and safe code-related answers.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+int64
+Beam search is a strategy that considers the 'beam_size' most probable sequences at each step
+
+max_length
+int64
+The maximum length for the generated code or text
+
+prompt
+string
+required
+Prompt is a textual input, either in code or natural language, for the model to generate a response
+
+repetition_penalty
+float
+This helps the model to avoid repeating the same phrases or code
+
+system_prompt
+string
+System level guidance to the model, providing a general direction for generated outputs
+
+Provide factual, concise and correct answers.
+temp
+float
+Temperature dictates the randomness of predictions. Lower values make the output more deterministic, while higher values result in more diverse responses
+
+top_k
+int64
+Top-k sampling narrows the token consideration set and makes it less likely to go off topic
+
+top_p
+float
+Top-p sampling widens the range of token consideration, allowing for more creative responses
+
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/codellama-13b-instruct"
+
+payload = { "system_prompt": "Provide factual, concise and correct answers." }
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# Falcon-7B Instruct
+Falcon-7B Instruct
+POST
+https://api.monsterapi.ai/v1/generate/falcon-7b-instruct
+Falcon-7B-Instruct is a 7B parameters causal decoder-only model built by TII based on Falcon-7B and finetuned on a mixture of chat/instruct datasets
+It has been trained on 1,500B tokens of RefinedWeb enhanced with curated corpora and thus outperforms comparable open-source models (e.g., MPT-7B, StableLM, RedPajama etc.)
+
+It works out of the box for instruction based text generation use-cases such as:
+1.Copywriting
+2.Summarisation
+3.Code-writing
+4.Classification
+5.Sentiment analysis
+and much more.
+
+Falcon-7B-Instruct is mostly trained on English data, and will not generalize appropriately to other languages. Furthermore, as it is trained on a large-scale corpora representative of the web, it will carry the stereotypes and biases commonly encountered online.
+Thus we recommend using it responsibly and with caution.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+int64
+Beam search is a decoding strategy that keeps track of the 'beam_size' most probable sequences at each step
+
+1
+max_length
+int64
+The maximum length for the generated text
+
+256
+prompt
+string
+required
+Prompt is a textual instruction for the model to produce an output
+
+temp
+float
+Temperature influences the randomness of predictions.
+Lower values (closer to 0) make the output more deterministic and conservative, higher values (closer to 1) produce more diverse and "risky" responses
+
+0.98
+top_k
+int64
+Top-k sampling helps improve quality by removing the tail and making it less likely to go off topic
+
+10
+top_p
+float
+Top-p sampling helps generate more diverse and creative text by considering a broader range of tokens
+
+0.9
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/falcon-7b-instruct"
+
+payload = {
+    "beam_size": 1,
+    "max_length": 256,
+    "temp": 0.98,
+    "top_k": 10,
+    "top_p": 0.9
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# FLAN-T5 Instruct
+FLAN-T5 Instruct
+POST
+https://api.monsterapi.ai/v1/generate/flan-T5
+FLAN-T5 is a 11.3 billion parameter model developed by Google. It is an extension of the original
+T5 (Text-to-Text Transfer Transformer) model and has been fine-tuned on more than 1000 additional tasks
+covering multiple languages, providing enhanced capabilities over the original T5.
+
+The FLAN-T5 model is versatile and can be employed in a variety of text generation contexts, including but not limited to:
+
+Text Completion: Adding missing parts to a given text.
+Sentiment Analysis: Evaluating the emotional tone of a text.
+Question Answering: Providing answers to specific queries.
+Translation: Converting text from one language to another.
+And various other tasks.
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+int64
+The number of beams for beam search. Higher values mean the model will consider more alternatives, at the expense of increased computation
+
+1
+max_length
+int64
+The maximum length of the sequence to be generated
+
+256
+prompt
+string
+required
+The text instruction for the model
+
+repetition_penalty
+float
+Penalty applied for repeating tokens
+
+1.2
+temp
+float
+Temperature controls the randomness of predictions by scaling the logits before applying softmax
+
+0.98
+top_k
+int64
+Top-k sampling helps improve quality by removing the tail and making it less likely to go off topic
+
+40
+top_p
+float
+Top-p sampling helps generate more diverse and creative text by considering a broader range of tokens
+
+1
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/flan-T5"
+
+payload = {
+    "beam_size": 1,
+    "max_length": 256,
+    "repetition_penalty": 1.2,
+    "temp": 0.98,
+    "top_k": 40,
+    "top_p": 1
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# Llama2-7B-Chat
+Llama2-7B-Chat
+POST
+https://api.monsterapi.ai/v1/generate/llama2-7b-chat
+Llama2-7B-Chat is a 7B parameters generative text model built by Meta as part of the Llama 2 family of large language models (LLMs), and has been fine-tuned for dialogue use cases. It was pretrained on 2 trillion tokens of data from publicly available sources and further refined using over one million new human-annotated examples. The model does not include Meta user data in its training.
+
+This model outperforms open-source chat models on most benchmarks tested and stands at par with popular closed-source models like ChatGPT and PaLM in human evaluations for helpfulness and safety.
+
+It works best for dialogue and chat-based applications. However, being trained primarily on English data, it may not generalize well to other languages. Like most AI language models, it may reproduce stereotypes and biases present in the data it was trained on, so use responsibly and with caution.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+int64
+The beam size for beam search. A larger beam size results in better quality output, but slower generation times
+
+1
+max_length
+int64
+The maximum length of the generated text
+
+256
+prompt
+string
+required
+Prompt is a textual instruction for the model to produce an output
+
+repetition_penalty
+float
+The model uses this penalty to discourage the repetition of tokens in the output
+
+1.2
+system_prompt
+string
+A system_prompt is the initial input or instruction that guides the model's response or action in further generation.
+
+temp
+float
+The temperature influences the randomness of the next token predictions
+
+0.98
+top_k
+int64
+Top-k sampling helps improve quality by removing the tail and making it less likely to go off topic
+
+40
+top_p
+float
+Top-p sampling helps generate more diverse and creative text by considering a broader range of tokens
+
+0.9
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/llama2-7b-chat"
+
+payload = {
+    "beam_size": 1,
+    "max_length": 256,
+    "repetition_penalty": 1.2,
+    "temp": 0.98,
+    "top_k": 40,
+    "top_p": 0.9
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# MPT-7B Instruct
+MPT-7B Instruct
+POST
+https://api.monsterapi.ai/v1/generate/mpt-7b-instruct
+MPT-7B-Instruct is a 7B parameters causal decoder-only model built by
+MosaicML based on MPT-7B and
+finetuned on a dataset derived from the Databricks Dolly-15k and the Anthropic Helpful and Harmless (HH-RLHF) datasets.
+
+The foundational model has been trained on 1T tokens of English text and code.
+
+It works out of the box for instruction based text generation use-cases
+such as:
+
+Copywriting
+Summarisation
+Code-writing
+Classification
+Sentiment analysis
+and much more.
+
+This series of models have been trained on a dataset with biases and stereotypes filtered, unlike other models like Falcon. However, MPT may still output unexpected results from time to time, so we request you to use it with care.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+max_length
+int64
+The maximum length of the generated text
+
+256
+prompt
+string
+required
+Prompt is a textual instruction for the model to produce an output
+
+temp
+float
+The temperature influences the randomness of the next token predictions
+
+0.98
+top_k
+int64
+Top-k sampling helps improve quality by removing the tail and making it less likely to go off topic
+
+40
+top_p
+float
+Top-p sampling helps generate more diverse and creative text by considering a broader range of tokens
+
+0.9
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/mpt-7b-instruct"
+
+payload = {
+    "max_length": 256,
+    "temp": 0.98,
+    "top_k": 40,
+    "top_p": 0.9
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# zephyr-7b-beta
+zephyr-7b-beta
+POST
+https://api.monsterapi.ai/v1/generate/zephyr-7b-beta
+zephyr-7b-beta is a language model with 7 billion parameters, designed as part of the Zephyr series of AI models. It's a refined iteration of the mistralai/Mistral-7B-v0.1, enhanced by Direct Preference Optimization (DPO) on a blend of publicly available and synthetic datasets. The model shows improved performance on benchmarks like MT Bench and is adept at providing helpful responses.
+
+While zephyr-7b-beta is capable of generating more dynamic text, users should be aware that without the in-built alignment of the datasets, there is a higher risk of producing problematic content. A technical report is available for those interested in the specifics of the training and finetuning process.
+
+To interact with zephyr-7b-beta, send a prompt and optional parameters, then use the appropriate API to retrieve results.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+int64
+Dictates the breadth of the beam search strategy, influencing the diversity of the completion.
+
+1
+max_length
+int64
+Determines the maximum token length of model completions.
+
+256
+prompt
+string
+required
+A mandatory input query for the model to generate a response. It should be a clear and direct question or statement.
+
+repetition_penalty
+float
+Penalizes repeated phrases to encourage diverse and dynamic outputs.
+
+1.2
+system_prompt
+string
+A guiding instruction to the model to shape the nature of its responses.
+
+Provide factual, concise and correct answers.
+temp
+float
+Adjusts the randomness of the predictions; lower for more predictable results, higher for more varied.
+
+0.7
+top_k
+int64
+Limits the selection of next tokens to the top k candidates, leading to more focused outputs.
+
+40
+top_p
+float
+Controls the nucleus of the probability distribution, allowing for varied but controlled creative responses.
+
+1
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+# Image to Image
+Image to Image
+POST
+https://api.monsterapi.ai/v1/generate/img2img
+Image to Image API allows you to generate that resembles an original image provided by you, using stable diffusion model.
+
+Image to Image model requires a text prompt and an initial image url as the inputs to render a new image which has similar style and content to the initial image, but different details and composition.
+
+Make sure to use Fetch Results API after process_id is received
+
+This API supports file uploads upto 8MB. For larger files checkout our Recipe Below
+
+This API supports following use-cases:
+
+Want to upload a file < 8MB: Checkout Image2Image - Sample Code Recipe
+Want to upload a file > 8MB: Checkout File Upload > 8MB Recipe
+Want to send file url instead of upload: Checkout Image2Image File URL Recipe
+RECIPES
+File Upload > 8MB
+Open Recipe
+Image2Image - Sample Code
+Open Recipe
+Image2Image File URL
+Open Recipe
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+guidance_scale
+float
+Prompt guidance scale
+
+init_image_url
+file
+required
+Input Image File
+
+No file chosen
+negprompt
+string
+Negative text prompt for output image
+
+prompt
+string
+required
+Input prompt to create output image
+
+seed
+int64
+Randum number used to initialize the image generation
+
+steps
+int64
+Sampling steps per image
+
+strength
+float
+Controls how much the original image will be modified
+
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/img2img"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+
+# PhotoMaker
+PhotoMaker
+POST
+https://api.monsterapi.ai/v1/generate/photo-maker
+Photomaker API allows you to create realistic customizations of input images.
+
+Photomaker developed by Tencent ARC Lab enables the encoding of multiple input ID images into a unified representation.
+
+The model requires a text prompt and an reference image as an input to render images that are conditioned on your provided text prompt.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+init_image_url
+file
+required
+Input Image File. Supported Formats: .jpg, .jpeg, .png
+
+No file chosen
+negprompt
+string
+Negative text prompt for output image
+
+prompt
+string
+required
+Input prompt to create output image
+
+safe_filter
+boolean
+When the "safe_filter" is set to true, the model will actively filter out any potential NSFW (Not Safe for Work) content, ensuring a safer and more appropriate experience for users. However, it is important to note that the Safe Filter is not foolproof, and users must remain vigilant and take necessary steps to comply with the platform's Terms of Service.
+
+
+true
+samples
+int64
+No. of images to be generated
+
+seed
+int64
+Random number used to initialize the image generation. Use the same seed for reproducability
+
+steps
+int64
+Number of sampling steps (more steps can lead to better results but it also leads to higher processing time)
+
+strength
+int64
+It defines how much the output image should follow your provided initial image
+
+style
+string
+Use this parameter to steer the image generation model toward a specific style
+
+
+anime
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/photo-maker"
+
+payload = "-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"safe_filter\"\r\n\r\ntrue\r\n-----011000010111000001101001--\r\n\r\n"
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data; boundary=---011000010111000001101001"
+}
+
+response = requests.post(url, data=payload, headers=headers)
+
+print(response.text)
+
+# Instruct-pix2pix
+Instruct-pix2pix
+POST
+https://api.monsterapi.ai/v1/generate/pix2pix
+Pix2Pix API allows you to edit any image by using simple text instructions. This API uses Instruct-pix2pix model made by Timothy Brooks.
+
+Pix2Pix model requires a text prompt and an initial image url as the inputs to render a new image which has similar style and content to the initial image, but different details and composition.
+
+Make sure to use Fetch Results API after process_id is received
+
+This API supports following use-cases:
+
+Want to upload a file < 8MB: Checkout Pix2Pix - Sample Code Recipe
+Want to upload a file > 8MB: Checkout File Upload > 8MB Recipe
+Want to send file url instead of upload: Checkout Pix2Pix File URL Recipe
+RECIPES
+File Upload > 8MB
+Open Recipe
+Pix2Pix - Sample Code
+Open Recipe
+Pix2Pix File URL
+Open Recipe
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+guidance_scale
+float
+It defines how much the output image should follow your text prompt
+
+image_guidance_scale
+float
+It defines how much the output image should follow your provided initial image
+
+init_image_url
+file
+required
+Input Image File. Supported Formats: .jpg, .jpeg, .png
+
+No file chosen
+negprompt
+string
+Negative text prompt for output image
+
+prompt
+string
+required
+Input prompt to create output image
+
+seed
+int64
+Randum number used to initialize the image generation
+
+steps
+int64
+Number of sampling steps (more steps can lead to better results but it also leads to higher cost)
+
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/pix2pix"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+# Text to Image SDXL
+Text to Image SDXL
+POST
+https://api.monsterapi.ai/v1/generate/sdxl-base
+SDXL 1.0 is the flagship image model from Stability AI and the best open model for image generation
+The SDXL Model can generate images of high quality in virtually any art style and is the best open model for photorealism.
+
+The model requires a text prompt as an input to render images that are conditioned on your provided text prompt.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+aspect_ratio
+string
+orientiation of output
+
+
+square
+guidance_scale
+float
+It defines how much the output image should follow your text prompt
+
+negprompt
+string
+Negative text prompt for output image
+
+prompt
+string
+required
+Input prompt to create output image
+
+safe_filter
+boolean
+When the "safe_filter" is set to true, the model will actively filter out any potential NSFW (Not Safe for Work) content, ensuring a safer and more appropriate experience for users. However, it is important to note that the Safe Filter is not foolproof, and users must remain vigilant and take necessary steps to comply with the platform's Terms of Service.
+
+
+true
+samples
+int64
+No. of images to be generated
+
+seed
+int64
+Random number used to initialize the image generation
+
+steps
+int64
+Number of sampling steps (more steps can lead to better results but it also leads to higher cost)
+
+style
+string
+Use this parameter to steer the image generation model toward a specific style
+
+
+anime
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/sdxl-base"
+
+payload = { "safe_filter": True }
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# Text to Image
+Text to Image
+POST
+https://api.monsterapi.ai/v1/generate/txt2img
+Text to image API allows you to generate an image that looks similar to your provided text prompt using stable diffusion model.
+
+Text to Image model requires a text prompt as an input to render images that are conditioned on your provided text prompt.
+
+Make sure to use Fetch Results API after process_id is received
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+aspect_ratio
+string
+orientiation of output
+
+
+square
+guidance_scale
+float
+It defines how much the output image should follow your text prompt
+
+negprompt
+string
+Negative text prompt for output image
+
+prompt
+string
+required
+Input prompt to create output image
+
+samples
+int64
+No. of images to be generated
+
+seed
+int64
+Randum number used to initialize the image generation
+
+steps
+int64
+Number of sampling steps (more steps can lead to better results but it also leads to higher cost)
+
+style
+string
+Use this parameter to steer the image generation model toward a specific style
+
+
+anime
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/txt2img"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+# Speech to Text v2 - Whisper Large-v3
+Speech to Text v2 - Whisper Large-v3
+POST
+https://api.monsterapi.ai/v1/generate/speech2text-v2
+Speech to Text v2 API allows you to transcribe any audio file using OpenAI-Whisper Large-v3 model.
+
+OpenAI Whisper is an open-source automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.
+
+The large-v3 model shows improved performance over a wide variety of languages, showing 10% to 20% reduction of errors compared to Whisper large-v2.
+
+Make sure to use Fetch Results API after process_id is received
+
+This API supports following use-cases:
+
+Want to upload a file < 8MB: Checkout Whisper - Sample Code Recipe
+Want to upload a file > 8MB: Checkout File Upload > 8MB Recipe
+Want to send file url instead of upload: Checkout Whisper File URL Recipe
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+diarize
+boolean
+Employs an embedding model to identify speakers, along with their respective transcripts and durations
+
+
+do_sample
+boolean
+Whether or not to use sampling ; use greedy decoding otherwise. When set to True, this parameter enables decoding strategies such as beam-search multinomial sampling, Top-K sampling and Top-p sampling etc. All these strategies select the next token from the probability distribution over the entire vocabulary with various strategy-specific adjustments.
+
+
+true
+file
+file
+required
+Input audio or video file. Size upto 8MB.
+supported file formats: m4a, mp3, mp4, mpeg, mpga, wav, webm, ogg
+
+No file chosen
+language
+string
+Defines the language for transcription output. Translates the transcript to your preferred language
+
+Allowed options:
+'af', 'am', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn', 'bo', 'br', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fo', 'fr', 'gl', 'gu', 'ha', 'haw', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'la', 'lb', 'ln', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'nn', 'no', 'oc', 'pa', 'pl', 'ps', 'pt', 'ro', 'ru', 'sa', 'sd', 'si', 'sk', 'sl', 'sn', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'uk', 'ur', 'uz', 'vi', 'yi', 'yo', 'zh'
+
+num_speakers
+integer
+Number of speakers present in the audio file. Used in conjunction with the "diarize" parameter, which enables speaker diarization. Provide an accurate value to achieve precise speaker identification.
+
+repetition_penalty
+float
+The model uses this penalty to discourage the repetition of tokens in the output
+
+0.9
+temperature
+float
+The value used to modulate the next token probabilities.
+
+0.9
+top_k
+int64
+The number of highest probability vocabulary tokens to keep for top-k-filtering.
+
+50
+top_p
+float
+Top-p sampling helps generate more diverse and creative text by considering a broader range of tokens
+
+0.9
+transcription_format
+string
+Defines the output format.
+
+
+text
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/speech2text-v2"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+# Text to Speech - Bark
+Text to Speech - Bark
+POST
+https://api.monsterapi.ai/v1/generate/sunoai-bark
+Text to Speech API allows you to convert text to an audio file using Suno AI Bark model.
+
+Bark is a transformer-based text-to-audio model created by Suno. Bark can generate highly realistic, multilingual speech as well as other audio - including music, background noise and simple sound effects.
+
+API supports generating audio files of extended length (upto 60 min)
+Different sample rates, speaker, text and waveform temperature will result in different quality or texture of voice in the output audio file
+
+Make sure to use Fetch Results API after process_id is received
+
+This API supports following use-cases:
+
+Want to upload a file < 8MB: Checkout Sunoai Bark - Sample Code Recipe
+Want to upload a file > 8MB: Checkout File Upload > 8MB Recipe
+Want to send file url instead of upload: Checkout Sunoai Bark File URL Recipe
+RECIPES
+File Upload > 8MB
+Open Recipe
+Sunoai bark - Sample Code
+Open Recipe
+Sunoai Bark File URL
+Open Recipe
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+file
+file
+file that needs to be cloned.
+Supported file formats: m4a, mp3, mp4, mpeg, mpga, wav, webm, ogg.
+This parameter is utilized exclusively alongside the voice_clone functionality
+
+No file chosen
+prompt
+string
+required
+Input prompt to create output audio file
+
+sample_rate
+int64
+Sampling rate for output audio
+
+speaker
+string
+Defines the language and speaker for speech.
+Accepted Format: {language}_speaker_{number}
+Supported Languages:
+'de': 'German', 'en': 'English', 'es': 'Spanish', 'fr': 'French', 'hi': 'Hindi', 'it': 'Italian', 'ja': 'Japanese', 'ko': 'Korean', 'pl': 'Polish', 'pt': 'Portuguese', 'ru': 'Russian', 'tr': 'Turkish', 'zh': 'Chinese'
+Supported numbers: 0 to 9
+
+text_temp
+float
+Temperature setting for text prompt
+
+voice_clone
+boolean
+When the voice_clone parameter is set to True, the model attempts to replicate the vocal characteristics of the speaker, aiming to generate an audio file that closely emulates the original voice.
+Please note that the accuracy of this emulation can vary
+
+
+false
+wave_temp
+float
+Temperature setting for audio waveform
+
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/sunoai-bark"
+
+payload = "-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"voice_clone\"\r\n\r\nfalse\r\n-----011000010111000001101001--\r\n\r\n"
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data; boundary=---011000010111000001101001"
+}
+
+response = requests.post(url, data=payload, headers=headers)
+
+print(response.text)
+
+# Speech to Text - Whisper
+Speech to Text - Whisper
+POST
+https://api.monsterapi.ai/v1/generate/whisper
+Speech to Text API allows you to transcribe any audio file using OpenAI-Whisper Large-v2 model.
+
+OpenAI Whisper is an open-source automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web.
+Large-v2 is a biggest version of whisper model and offers superior transcription quality.
+
+Make sure to use Fetch Results API after process_id is received
+
+This API supports following use-cases:
+
+Want to upload a file < 8MB: Checkout Whisper - Sample Code Recipe
+Want to upload a file > 8MB: Checkout File Upload > 8MB Recipe
+Want to send file url instead of upload: Checkout Whisper File URL Recipe
+RECIPES
+File Upload > 8MB
+Open Recipe
+Whisper - Sample Code
+Open Recipe
+Whisper File URL
+Open Recipe
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+webhook_url_name
+string
+Webhook URL name to get task status. These webhooks should be registered with Monster API
+
+BODY PARAMS
+beam_size
+string
+Controls the breadth of the search for the best transcription.
+A larger beam size results in better quality output, but slower inference times.
+
+5
+best_of
+string
+Determines the number of diverse transcription versions generated and considered, useful for exploring different audio interpretations
+
+8
+diarize
+boolean
+Employs an embedding model to identify speakers, along with their respective transcripts and durations
+
+
+file
+file
+required
+Input audio or video file. Size upto 8MB.
+supported file formats: m4a, mp3, mp4, mpeg, mpga, wav, webm, ogg
+
+No file chosen
+language
+string
+Defines the language for transcription output. Translates the transcript to your preferred language
+
+Allowed options:
+'af', 'am', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn', 'bo', 'br', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'eu', 'fa', 'fi', 'fo', 'fr', 'gl', 'gu', 'ha', 'haw', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'jw', 'ka', 'kk', 'km', 'kn', 'ko', 'la', 'lb', 'ln', 'lo', 'lt', 'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'mr', 'ms', 'mt', 'my', 'ne', 'nl', 'nn', 'no', 'oc', 'pa', 'pl', 'ps', 'pt', 'ro', 'ru', 'sa', 'sd', 'si', 'sk', 'sl', 'sn', 'so', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tk', 'tl', 'tr', 'tt', 'uk', 'ur', 'uz', 'vi', 'yi', 'yo', 'zh'
+
+num_speakers
+integer
+Number of speakers present in the audio file. Used in conjunction with the "diarize" parameter, which enables speaker diarization. Provide an accurate value to achieve precise speaker identification.
+
+prompt
+string
+Input prompt for Audio files
+
+remove_silence
+boolean
+Remove silence from Audio files before processing
+
+
+transcription_format
+string
+Defines the output format.
+
+
+text
+RESPONSES
+
+200
+Successful Operation
+
+
+400
+Forbidden
+
+
+401
+Unauthorised
+
+
+403
+Forbidden
+
+
+415
+Unsupported Media Type
+
+
+429
+Too Many requests
+
+
+500
+Internal Server Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/generate/whisper"
+
+payload = "-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"beam_size\"\r\n\r\n5\r\n-----011000010111000001101001\r\nContent-Disposition: form-data; name=\"best_of\"\r\n\r\n8\r\n-----011000010111000001101001--\r\n\r\n"
+headers = {
+    "accept": "application/json",
+    "content-type": "multipart/form-data; boundary=---011000010111000001101001"
+}
+
+response = requests.post(url, data=payload, headers=headers)
+
+print(response.text)
+
+# Health
+Health
+GET
+https://api.monsterapi.ai/v1/deploy/health
+Health Check
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+RESPONSE
+
+200
+Successful Response
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/health"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# Deploy Llm
+Deploy Llm
+POST
+https://api.monsterapi.ai/v1/deploy/llm
+MonsterAPI Deploy service deploy Opensource or private llm along with lora adapter with one request onto monsterAPI compute infrastructure.
+
+Path to the base model can be a huggingface model. Needs to be a valid hugging face model.
+Our service is based on vllm and any model supported by vllm is hence supported by this service.
+
+Basemodels we have confirmed to work are as follow:
+
+Falcon (tiiuae/falcon-7b, tiiuae/falcon-40b, tiiuae/falcon-rw-7b, etc.)
+GPT-2 (gpt2, gpt2-xl, etc.) - Limited to 1xGPU
+GPT-J (EleutherAI/gpt-j-6b, nomic-ai/gpt4all-j, etc.) - Limited to 1xGPU
+GPT-NeoX (EleutherAI/gpt-neox-20b, databricks/dolly-v2-12b, stabilityai/stablelm-tuned-alpha-7b, etc.)
+LLaMA & LLaMA-2 (meta-llama/Llama-2-70b-hf, lmsys/vicuna-13b-v1.3, young-geng/koala, openlm-research/open_llama_13b, etc.) - lmsys/vicuna-13b-v1.3
+Mistral (mistralai/Mistral-7B-v0.1, mistralai/Mistral-7B-Instruct-v0.1, etc.)
+MPT (mosaicml/mpt-7b, mosaicml/mpt-30b, etc.)
+OPT (facebook/opt-66b, facebook/opt-iml-max-30b, etc.)
+Qwen (Qwen/Qwen-7B, Qwen/Qwen-7B-Chat, etc.)
+Please note that we are working on adding more models to this list and if you have any specific model request please reach out to us at
+support@monsterapi.ai or join our discord server at https://discord.gg/3qXwXVX9
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+BODY PARAMS
+deployment_name
+string
+Unique deployment for the instance, auto-generated if not provided.
+
+loyal_volta
+basemodel_path
+string
+required
+Path to a huggingface base model or a url to a zip file containing model. Either way model provided should be compatible with transformers.AutoModelForCausalLM and vllm.
+
+loramodel_path
+string
+Path to the LoRA model can be a huggingface model or a custom model link to zip file or leave empty string to not use lora model.
+
+prompt_template
+string
+required
+Template for the prompt,
+Prompt template should contain at least two pairs of {key}
+with some content key in between like {prompt}{completion},
+one for input another for output.
+
+**Examples:**
+-------------
+
+1. codefuse-ai/CodeFuse-CodeLlama-34B
+    prompt_template:
+            <|role_start|>human<|role_end|> {prompt} 
+            <|role_start|>bot<|role_end|> {response}
+
+2.  huggingfaceh4/zephyr-7b-beta
+    prompt_template:
+            <|system|>
+            {system} </s>
+            <|user|>
+            {prompt} </s>
+            <|assistant|>
+            {response}
+per_gpu_vram
+integer
+required
+Per GPU VRAM to be used
+
+
+8
+gpu_count
+integer
+required
+Number of GPUs to be used, if multiple gpus are selected
+
+
+1
+api_auth_token
+string
+API authentication token to be able to access the monsterapi deploy service llm endpoint, auto-generated if not provided.
+
+d75c5a85-e3ed-4f5f-85e1-147dfd79825f
+use_nightly
+boolean
+Use nightly docker image for the deployment, experimental!
+
+
+false
+RESPONSES
+
+200
+Success response
+
+
+402
+Not enough tokens to launch an instance
+
+
+403
+User has crossed the maximum number of running deployments
+
+
+405
+User ID or user email not found in the request
+
+
+422
+Validation Error
+
+
+500
+Failure response
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/llm"
+
+payload = {
+    "deployment_name": "loyal_volta",
+    "per_gpu_vram": 8,
+    "gpu_count": 1,
+    "api_auth_token": "d75c5a85-e3ed-4f5f-85e1-147dfd79825f",
+    "use_nightly": False
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# Deploy Custom Image
+Deploy Custom Image
+POST
+https://api.monsterapi.ai/v1/deploy/custom_image
+Will Launch a QBlocks Instance that will host the Custom Docker Image
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+BODY PARAMS
+instance_params
+object
+required
+
+INSTANCEPARAMS OBJECT
+image_registry
+object
+required
+
+DOCKERIMGPARAMS OBJECT
+env_params
+Dict of environment variables to be passed to the docker image
+
+
+OPTION 1
+
+OPTION 2
+port_numbers
+List of port numbers to be exposed by the docker image
+
+
+OPTION 1
+
+OPTION 2
+RESPONSES
+
+200
+Success response
+
+
+402
+Not enough tokens to launch an instance
+
+
+403
+User has crossed the maximum number of running deployments
+
+
+405
+User ID or user email not found in the request
+
+
+422
+Validation Error
+
+
+500
+Failure response
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/custom_image"
+
+payload = {
+    "instance_params": {
+        "hostname": "mysterious_hawking_cdc2c598-8",
+        "harddisk": "100",
+        "blockName": "qb24-v2-n1"
+    },
+    "image_registry": { "registryName": "hello-world" }
+}
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+
+print(response.text)
+
+# List Deployments
+List Deployments
+GET
+https://api.monsterapi.ai/v1/deploy/list
+List all the deployments for a user
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+QUERY PARAMS
+status
+string
+
+deployment_service
+string
+
+RESPONSES
+
+200
+Success response
+
+
+202
+No deployments found for this user_id
+
+
+404
+Cannot fetch user info response, please contact support
+
+
+422
+Validation Error
+
+
+500
+Internal server error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/list"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# Status
+Status
+GET
+https://api.monsterapi.ai/v1/deploy/status/{deployment_id}
+Get the status of a deployment
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+PATH PARAMS
+deployment_id
+string
+required
+RESPONSES
+
+200
+Success response
+
+
+400
+Instance launch has failed
+
+
+404
+No such instance
+
+
+422
+Validation Error
+
+
+500
+Internal server error
+
+
+501
+Instance is not started yet, please try again.
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/status/deployment_id"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# Logs
+Logs
+GET
+https://api.monsterapi.ai/v1/deploy/logs/{deployment_id}
+Get the logs of a deployment
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+PATH PARAMS
+deployment_id
+string
+required
+QUERY PARAMS
+n_lines
+integer
+Number of log lines to retrieve
+
+30
+RESPONSES
+
+200
+Success response
+
+
+202
+Instance is not live, please try again or use status to confirm!
+
+
+404
+No such instance
+
+
+422
+Validation Error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/logs/deployment_id?n_lines=30"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
+
+# Terminate
+Terminate
+POST
+https://api.monsterapi.ai/v1/deploy/terminate
+Terminate the instance
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+BODY PARAMS
+deployment_id
+string
+required
+actor
+string
+Default: user
+
+
+user
+RESPONSES
+
+200
+Success response
+
+401
+User not allowed perform termination as system
+
+
+403
+No such instance
+
+
+404
+Failure response
+
+
+405
+Invalid actor
+
+409
+Deployment Already terminated by System / User
+
+
+422
+Validation Error
+
+501
+Deployment provision in progress, please try again!
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/terminate"
+
+headers = {
+    "accept": "application/json",
+    "content-type": "application/json"
+}
+
+response = requests.post(url, headers=headers)
+
+print(response.text)
+
+# Get Instances
+Get Instances
+GET
+https://api.monsterapi.ai/v1/deploy/instances
+Get List of available compute instances.
+
+LOG IN TO SEE FULL REQUEST HISTORY
+TIME	STATUS	USER AGENT	
+Make a request to see history.
+0 Requests This Month
+
+RESPONSES
+
+200
+Success response
+
+500
+Internal server error
+
+Python Code:
+import requests
+
+url = "https://api.monsterapi.ai/v1/deploy/instances"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+
+print(response.text)
